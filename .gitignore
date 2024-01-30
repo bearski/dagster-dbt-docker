@@ -1,0 +1,74 @@
+# user files
+tmp*
+.user.yml
+.DS_Store
+
+.gradle
+.idea
+.vscode
+*.iml
+*.swp
+.DS_Store
+.dockerversions
+.classpath
+.project
+.settings
+.vscode
+
+build
+
+# Secrets
+secrets
+
+# Python
+*.egg-info
+__pycache__
+.pyc
+.eggs
+.mypy_cache
+.ipynb_checkpoints
+*.ipynb
+.pytest_
+
+# Virtualenv
+# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
+.Python
+.venv
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+pip-selfcheck.json
+
+# Python unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# airbyte
+airbyte/run/
+
+#dbt
+transformation_dbt/dbt_packages/
+transformation_dbt/logs/
+transformation_dbt/target/
+transformation_dbt/profiles.yml
+
+
+# open stack project
+visualization/metabase/plugins
+visualization/metabase/metabase.jar
+

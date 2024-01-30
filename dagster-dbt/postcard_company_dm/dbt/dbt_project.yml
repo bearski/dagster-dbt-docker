@@ -1,0 +1,39 @@
+## Using dbt with Dagster -  https://docs.dagster.io/integrations/dbt/using-dbt-with-dagster/part-one
+
+name: 'postcard_company'
+version: '1.0.0'
+config-version: 2
+
+# set dbt profile.
+profile: 'postcard_company'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+packages-install-path: /dbt-packages
+
+# directory for sql files
+target-path: "target"  
+# directories to be removed by `dbt clean`
+clean-targets:         
+  - "target"
+  - "dbt_packages"
+
+# Configuring models: https://docs.getdbt.com/docs/configuring-models
+# build all models in the example/ directory as tables.
+models:
+  postcard_company:
+    +materialized: table
+
+seeds:
+  postcard_company:
+    +enabled: true
+    +schema: raw
+    geography:
+      id: int
+      cityname: varchar(32)
+      countryname: varchar(32)
+      regionname: varchar(32)
