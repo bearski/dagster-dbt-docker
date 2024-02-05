@@ -27,9 +27,8 @@ model_resources = {
 
 
 @dbt_assets(manifest=DBT_MANIFEST_PATH)
-def dag_dbt_assets(context, dbt):
+def dag_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
-
 
 @asset(
     compute_kind="python",
