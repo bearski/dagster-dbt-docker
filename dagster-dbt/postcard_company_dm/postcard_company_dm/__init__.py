@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 
-from dagster_dbt import dbt_cli_resource, dbt_test_op, dbt_assets, load_assets_from_dbt_project, DbtCliResource, get_asset_key_for_model
+from dagster_dbt import dbt_test_op, dbt_assets, DbtCliResource, get_asset_key_for_model
 from dagster import Definitions, file_relative_path, job, MetadataValue, AssetExecutionContext, asset
 
 
@@ -14,12 +14,11 @@ DBT_PROJECT_PATH = file_relative_path(__file__, "../dbt")
 DBT_PROFILES = file_relative_path(__file__, "../dbt/config")
 DBT_MANIFEST_PATH = file_relative_path(__file__, "../dbt/target/manifest.json")
 
-dbt_resource = dbt_cli_resource.configured(
-        {
-            "project_dir": DBT_PROJECT_PATH,
-            "profiles_dir": DBT_PROFILES,
-        }
-    )
+dbt_resource = DbtCliResource(
+    project_dir=DBT_PROJECT_PATH,
+    profiles_dir=DBT_PROFILES,
+)
+
 
 model_resources = {
     "dbt": dbt_resource
@@ -28,7 +27,7 @@ model_resources = {
 
 @dbt_assets(manifest=DBT_MANIFEST_PATH)
 def dag_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource):
-    yield from dbt.cli(["build"], context=context).stream()
+    yield from dbt.cli(["run"], context=context).stream()
 
 @asset(
     compute_kind="python",
@@ -69,16 +68,23 @@ def mean_transactions_per_month(context: AssetExecutionContext):
     compare_reset_index = compare.reset_index()
     mean = compare_reset_index[compare_reset_index['mean'] > 0][['tran_month', 'mean']]
 
+    csv_file_path = "../../../../shared/csv/tran_month_mean_chart.csv"
+    mean.to_csv(csv_file_path, index=False)
     # create a plot of number of orders by customer and write it out to an HTML file
+
     fig = px.histogram(mean, x="tran_month")
     fig.update_layout(bargap=0.2)
-    save_chart_path = duckdb_database_path.parent.joinpath("tran_month_mean_chart.html")
+
+    save_chart_path = "../../../../shared/chart/tran_month_mean_chart.html"
     fig.write_html(save_chart_path, auto_open=True)
 
     # tell Dagster about the location of the HTML file,
     # so it's easy to access from the Dagster UI
     context.add_output_metadata(
-        {"plot_url": MetadataValue.url("file://" + os.fspath(save_chart_path))}
+        {
+            "plot_url": MetadataValue.url("file://" + os.fspath(save_chart_path)),
+            "csv_url": MetadataValue.url("file://" + os.fspath(save_chart_path))
+        }
     )
 
 
